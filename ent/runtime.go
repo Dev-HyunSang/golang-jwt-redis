@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/schema"
+	"github.com/dev-hyunsang/golang-jwt-redis/ent/todo"
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/user"
 	"github.com/google/uuid"
 )
@@ -14,6 +15,16 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	todoFields := schema.ToDo{}.Fields()
+	_ = todoFields
+	// todoDescTodoUUID is the schema descriptor for todo_uuid field.
+	todoDescTodoUUID := todoFields[0].Descriptor()
+	// todo.DefaultTodoUUID holds the default value on creation for the todo_uuid field.
+	todo.DefaultTodoUUID = todoDescTodoUUID.Default.(func() uuid.UUID)
+	// todoDescUserUUID is the schema descriptor for user_uuid field.
+	todoDescUserUUID := todoFields[1].Descriptor()
+	// todo.DefaultUserUUID holds the default value on creation for the user_uuid field.
+	todo.DefaultUserUUID = todoDescUserUUID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUserUUID is the schema descriptor for user_uuid field.

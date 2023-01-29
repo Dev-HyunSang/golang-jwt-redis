@@ -8,6 +8,22 @@ import (
 )
 
 var (
+	// ToDosColumns holds the columns for the "to_dos" table.
+	ToDosColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "todo_uuid", Type: field.TypeUUID},
+		{Name: "user_uuid", Type: field.TypeUUID},
+		{Name: "todo_title", Type: field.TypeString},
+		{Name: "todo_context", Type: field.TypeString},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "crated_at", Type: field.TypeTime},
+	}
+	// ToDosTable holds the schema information for the "to_dos" table.
+	ToDosTable = &schema.Table{
+		Name:       "to_dos",
+		Columns:    ToDosColumns,
+		PrimaryKey: []*schema.Column{ToDosColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -26,6 +42,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		ToDosTable,
 		UsersTable,
 	}
 )

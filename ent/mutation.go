@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/predicate"
+	"github.com/dev-hyunsang/golang-jwt-redis/ent/todo"
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/user"
 	"github.com/google/uuid"
 
@@ -25,8 +26,590 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeToDo = "ToDo"
 	TypeUser = "User"
 )
+
+// ToDoMutation represents an operation that mutates the ToDo nodes in the graph.
+type ToDoMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	todo_uuid     *uuid.UUID
+	user_uuid     *uuid.UUID
+	todo_title    *string
+	todo_context  *string
+	updated_at    *time.Time
+	crated_at     *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ToDo, error)
+	predicates    []predicate.ToDo
+}
+
+var _ ent.Mutation = (*ToDoMutation)(nil)
+
+// todoOption allows management of the mutation configuration using functional options.
+type todoOption func(*ToDoMutation)
+
+// newToDoMutation creates new mutation for the ToDo entity.
+func newToDoMutation(c config, op Op, opts ...todoOption) *ToDoMutation {
+	m := &ToDoMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeToDo,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withToDoID sets the ID field of the mutation.
+func withToDoID(id int) todoOption {
+	return func(m *ToDoMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ToDo
+		)
+		m.oldValue = func(ctx context.Context) (*ToDo, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ToDo.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withToDo sets the old ToDo of the mutation.
+func withToDo(node *ToDo) todoOption {
+	return func(m *ToDoMutation) {
+		m.oldValue = func(context.Context) (*ToDo, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ToDoMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ToDoMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ToDoMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ToDoMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ToDo.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTodoUUID sets the "todo_uuid" field.
+func (m *ToDoMutation) SetTodoUUID(u uuid.UUID) {
+	m.todo_uuid = &u
+}
+
+// TodoUUID returns the value of the "todo_uuid" field in the mutation.
+func (m *ToDoMutation) TodoUUID() (r uuid.UUID, exists bool) {
+	v := m.todo_uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTodoUUID returns the old "todo_uuid" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldTodoUUID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTodoUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTodoUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTodoUUID: %w", err)
+	}
+	return oldValue.TodoUUID, nil
+}
+
+// ResetTodoUUID resets all changes to the "todo_uuid" field.
+func (m *ToDoMutation) ResetTodoUUID() {
+	m.todo_uuid = nil
+}
+
+// SetUserUUID sets the "user_uuid" field.
+func (m *ToDoMutation) SetUserUUID(u uuid.UUID) {
+	m.user_uuid = &u
+}
+
+// UserUUID returns the value of the "user_uuid" field in the mutation.
+func (m *ToDoMutation) UserUUID() (r uuid.UUID, exists bool) {
+	v := m.user_uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserUUID returns the old "user_uuid" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldUserUUID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserUUID: %w", err)
+	}
+	return oldValue.UserUUID, nil
+}
+
+// ResetUserUUID resets all changes to the "user_uuid" field.
+func (m *ToDoMutation) ResetUserUUID() {
+	m.user_uuid = nil
+}
+
+// SetTodoTitle sets the "todo_title" field.
+func (m *ToDoMutation) SetTodoTitle(s string) {
+	m.todo_title = &s
+}
+
+// TodoTitle returns the value of the "todo_title" field in the mutation.
+func (m *ToDoMutation) TodoTitle() (r string, exists bool) {
+	v := m.todo_title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTodoTitle returns the old "todo_title" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldTodoTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTodoTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTodoTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTodoTitle: %w", err)
+	}
+	return oldValue.TodoTitle, nil
+}
+
+// ResetTodoTitle resets all changes to the "todo_title" field.
+func (m *ToDoMutation) ResetTodoTitle() {
+	m.todo_title = nil
+}
+
+// SetTodoContext sets the "todo_context" field.
+func (m *ToDoMutation) SetTodoContext(s string) {
+	m.todo_context = &s
+}
+
+// TodoContext returns the value of the "todo_context" field in the mutation.
+func (m *ToDoMutation) TodoContext() (r string, exists bool) {
+	v := m.todo_context
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTodoContext returns the old "todo_context" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldTodoContext(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTodoContext is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTodoContext requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTodoContext: %w", err)
+	}
+	return oldValue.TodoContext, nil
+}
+
+// ResetTodoContext resets all changes to the "todo_context" field.
+func (m *ToDoMutation) ResetTodoContext() {
+	m.todo_context = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ToDoMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ToDoMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ToDoMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetCratedAt sets the "crated_at" field.
+func (m *ToDoMutation) SetCratedAt(t time.Time) {
+	m.crated_at = &t
+}
+
+// CratedAt returns the value of the "crated_at" field in the mutation.
+func (m *ToDoMutation) CratedAt() (r time.Time, exists bool) {
+	v := m.crated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCratedAt returns the old "crated_at" field's value of the ToDo entity.
+// If the ToDo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToDoMutation) OldCratedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCratedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCratedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCratedAt: %w", err)
+	}
+	return oldValue.CratedAt, nil
+}
+
+// ResetCratedAt resets all changes to the "crated_at" field.
+func (m *ToDoMutation) ResetCratedAt() {
+	m.crated_at = nil
+}
+
+// Where appends a list predicates to the ToDoMutation builder.
+func (m *ToDoMutation) Where(ps ...predicate.ToDo) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *ToDoMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (ToDo).
+func (m *ToDoMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ToDoMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.todo_uuid != nil {
+		fields = append(fields, todo.FieldTodoUUID)
+	}
+	if m.user_uuid != nil {
+		fields = append(fields, todo.FieldUserUUID)
+	}
+	if m.todo_title != nil {
+		fields = append(fields, todo.FieldTodoTitle)
+	}
+	if m.todo_context != nil {
+		fields = append(fields, todo.FieldTodoContext)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, todo.FieldUpdatedAt)
+	}
+	if m.crated_at != nil {
+		fields = append(fields, todo.FieldCratedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ToDoMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case todo.FieldTodoUUID:
+		return m.TodoUUID()
+	case todo.FieldUserUUID:
+		return m.UserUUID()
+	case todo.FieldTodoTitle:
+		return m.TodoTitle()
+	case todo.FieldTodoContext:
+		return m.TodoContext()
+	case todo.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case todo.FieldCratedAt:
+		return m.CratedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ToDoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case todo.FieldTodoUUID:
+		return m.OldTodoUUID(ctx)
+	case todo.FieldUserUUID:
+		return m.OldUserUUID(ctx)
+	case todo.FieldTodoTitle:
+		return m.OldTodoTitle(ctx)
+	case todo.FieldTodoContext:
+		return m.OldTodoContext(ctx)
+	case todo.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case todo.FieldCratedAt:
+		return m.OldCratedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ToDo field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ToDoMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case todo.FieldTodoUUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTodoUUID(v)
+		return nil
+	case todo.FieldUserUUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserUUID(v)
+		return nil
+	case todo.FieldTodoTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTodoTitle(v)
+		return nil
+	case todo.FieldTodoContext:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTodoContext(v)
+		return nil
+	case todo.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case todo.FieldCratedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCratedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ToDo field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ToDoMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ToDoMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ToDoMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ToDo numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ToDoMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ToDoMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ToDoMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ToDo nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ToDoMutation) ResetField(name string) error {
+	switch name {
+	case todo.FieldTodoUUID:
+		m.ResetTodoUUID()
+		return nil
+	case todo.FieldUserUUID:
+		m.ResetUserUUID()
+		return nil
+	case todo.FieldTodoTitle:
+		m.ResetTodoTitle()
+		return nil
+	case todo.FieldTodoContext:
+		m.ResetTodoContext()
+		return nil
+	case todo.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case todo.FieldCratedAt:
+		m.ResetCratedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ToDo field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ToDoMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ToDoMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ToDoMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ToDoMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ToDoMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ToDoMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ToDoMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ToDo unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ToDoMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ToDo edge %s", name)
+}
 
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {

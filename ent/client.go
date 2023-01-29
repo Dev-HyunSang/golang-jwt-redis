@@ -10,6 +10,7 @@ import (
 
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/migrate"
 
+	"github.com/dev-hyunsang/golang-jwt-redis/ent/todo"
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/user"
 
 	"entgo.io/ent/dialect"
@@ -21,6 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// ToDo is the client for interacting with the ToDo builders.
+	ToDo *ToDoClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.ToDo = NewToDoClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -70,6 +74,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
+		ToDo:   NewToDoClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -90,6 +95,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
+		ToDo:   NewToDoClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -97,7 +103,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		ToDo.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -119,7 +125,98 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.ToDo.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// ToDoClient is a client for the ToDo schema.
+type ToDoClient struct {
+	config
+}
+
+// NewToDoClient returns a client for the ToDo from the given config.
+func NewToDoClient(c config) *ToDoClient {
+	return &ToDoClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `todo.Hooks(f(g(h())))`.
+func (c *ToDoClient) Use(hooks ...Hook) {
+	c.hooks.ToDo = append(c.hooks.ToDo, hooks...)
+}
+
+// Create returns a builder for creating a ToDo entity.
+func (c *ToDoClient) Create() *ToDoCreate {
+	mutation := newToDoMutation(c.config, OpCreate)
+	return &ToDoCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ToDo entities.
+func (c *ToDoClient) CreateBulk(builders ...*ToDoCreate) *ToDoCreateBulk {
+	return &ToDoCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ToDo.
+func (c *ToDoClient) Update() *ToDoUpdate {
+	mutation := newToDoMutation(c.config, OpUpdate)
+	return &ToDoUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ToDoClient) UpdateOne(td *ToDo) *ToDoUpdateOne {
+	mutation := newToDoMutation(c.config, OpUpdateOne, withToDo(td))
+	return &ToDoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ToDoClient) UpdateOneID(id int) *ToDoUpdateOne {
+	mutation := newToDoMutation(c.config, OpUpdateOne, withToDoID(id))
+	return &ToDoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ToDo.
+func (c *ToDoClient) Delete() *ToDoDelete {
+	mutation := newToDoMutation(c.config, OpDelete)
+	return &ToDoDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ToDoClient) DeleteOne(td *ToDo) *ToDoDeleteOne {
+	return c.DeleteOneID(td.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ToDoClient) DeleteOneID(id int) *ToDoDeleteOne {
+	builder := c.Delete().Where(todo.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ToDoDeleteOne{builder}
+}
+
+// Query returns a query builder for ToDo.
+func (c *ToDoClient) Query() *ToDoQuery {
+	return &ToDoQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ToDo entity by its id.
+func (c *ToDoClient) Get(ctx context.Context, id int) (*ToDo, error) {
+	return c.Query().Where(todo.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ToDoClient) GetX(ctx context.Context, id int) *ToDo {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ToDoClient) Hooks() []Hook {
+	return c.hooks.ToDo
 }
 
 // UserClient is a client for the User schema.
