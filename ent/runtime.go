@@ -25,6 +25,14 @@ func init() {
 	todoDescUserUUID := todoFields[1].Descriptor()
 	// todo.DefaultUserUUID holds the default value on creation for the user_uuid field.
 	todo.DefaultUserUUID = todoDescUserUUID.Default.(func() uuid.UUID)
+	// todoDescUpdatedAt is the schema descriptor for updated_at field.
+	todoDescUpdatedAt := todoFields[4].Descriptor()
+	// todo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	todo.DefaultUpdatedAt = todoDescUpdatedAt.Default.(func() time.Time)
+	// todoDescCratedAt is the schema descriptor for crated_at field.
+	todoDescCratedAt := todoFields[5].Descriptor()
+	// todo.DefaultCratedAt holds the default value on creation for the crated_at field.
+	todo.DefaultCratedAt = todoDescCratedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUserUUID is the schema descriptor for user_uuid field.

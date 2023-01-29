@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"time"
 )
 
 // ToDo holds the schema definition for the ToDo entity.
@@ -20,8 +21,10 @@ func (ToDo) Fields() []ent.Field {
 			Default(uuid.New),
 		field.String("todo_title"),
 		field.String("todo_context"),
-		field.Time("updated_at"),
-		field.Time("crated_at"),
+		field.Time("updated_at").
+			Default(time.Now),
+		field.Time("crated_at").
+			Default(time.Now),
 	}
 }
 

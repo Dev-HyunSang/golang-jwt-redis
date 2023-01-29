@@ -67,9 +67,25 @@ func (tdc *ToDoCreate) SetUpdatedAt(t time.Time) *ToDoCreate {
 	return tdc
 }
 
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tdc *ToDoCreate) SetNillableUpdatedAt(t *time.Time) *ToDoCreate {
+	if t != nil {
+		tdc.SetUpdatedAt(*t)
+	}
+	return tdc
+}
+
 // SetCratedAt sets the "crated_at" field.
 func (tdc *ToDoCreate) SetCratedAt(t time.Time) *ToDoCreate {
 	tdc.mutation.SetCratedAt(t)
+	return tdc
+}
+
+// SetNillableCratedAt sets the "crated_at" field if the given value is not nil.
+func (tdc *ToDoCreate) SetNillableCratedAt(t *time.Time) *ToDoCreate {
+	if t != nil {
+		tdc.SetCratedAt(*t)
+	}
 	return tdc
 }
 
@@ -157,6 +173,14 @@ func (tdc *ToDoCreate) defaults() {
 	if _, ok := tdc.mutation.UserUUID(); !ok {
 		v := todo.DefaultUserUUID()
 		tdc.mutation.SetUserUUID(v)
+	}
+	if _, ok := tdc.mutation.UpdatedAt(); !ok {
+		v := todo.DefaultUpdatedAt()
+		tdc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := tdc.mutation.CratedAt(); !ok {
+		v := todo.DefaultCratedAt()
+		tdc.mutation.SetCratedAt(v)
 	}
 }
 

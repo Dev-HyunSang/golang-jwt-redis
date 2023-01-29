@@ -75,9 +75,25 @@ func (tdu *ToDoUpdate) SetUpdatedAt(t time.Time) *ToDoUpdate {
 	return tdu
 }
 
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tdu *ToDoUpdate) SetNillableUpdatedAt(t *time.Time) *ToDoUpdate {
+	if t != nil {
+		tdu.SetUpdatedAt(*t)
+	}
+	return tdu
+}
+
 // SetCratedAt sets the "crated_at" field.
 func (tdu *ToDoUpdate) SetCratedAt(t time.Time) *ToDoUpdate {
 	tdu.mutation.SetCratedAt(t)
+	return tdu
+}
+
+// SetNillableCratedAt sets the "crated_at" field if the given value is not nil.
+func (tdu *ToDoUpdate) SetNillableCratedAt(t *time.Time) *ToDoUpdate {
+	if t != nil {
+		tdu.SetCratedAt(*t)
+	}
 	return tdu
 }
 
@@ -241,9 +257,25 @@ func (tduo *ToDoUpdateOne) SetUpdatedAt(t time.Time) *ToDoUpdateOne {
 	return tduo
 }
 
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tduo *ToDoUpdateOne) SetNillableUpdatedAt(t *time.Time) *ToDoUpdateOne {
+	if t != nil {
+		tduo.SetUpdatedAt(*t)
+	}
+	return tduo
+}
+
 // SetCratedAt sets the "crated_at" field.
 func (tduo *ToDoUpdateOne) SetCratedAt(t time.Time) *ToDoUpdateOne {
 	tduo.mutation.SetCratedAt(t)
+	return tduo
+}
+
+// SetNillableCratedAt sets the "crated_at" field if the given value is not nil.
+func (tduo *ToDoUpdateOne) SetNillableCratedAt(t *time.Time) *ToDoUpdateOne {
+	if t != nil {
+		tduo.SetCratedAt(*t)
+	}
 	return tduo
 }
 

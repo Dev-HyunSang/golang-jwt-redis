@@ -3,6 +3,8 @@
 package todo
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -53,4 +55,8 @@ var (
 	DefaultTodoUUID func() uuid.UUID
 	// DefaultUserUUID holds the default value on creation for the "user_uuid" field.
 	DefaultUserUUID func() uuid.UUID
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// DefaultCratedAt holds the default value on creation for the "crated_at" field.
+	DefaultCratedAt func() time.Time
 )
