@@ -7,6 +7,7 @@ import (
 	"github.com/dev-hyunsang/golang-jwt-redis/ent"
 	"github.com/dev-hyunsang/golang-jwt-redis/ent/user"
 	"github.com/dev-hyunsang/golang-jwt-redis/models"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
