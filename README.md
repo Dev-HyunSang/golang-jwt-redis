@@ -21,6 +21,69 @@ Go언어와 JWT(JSON Web Token)의 취약점을 Redis로 보완하는 프로젝�
 3. 올바른 사용자가 맞다면
    1. Redis 기록된 Access Token(접근에 관여하는 토큰)와  Refresh Token(재발급에 관여하는 토큰)를 비교합니다.
 
+## REST API Docs
+### POST `/auth/join`
+#### Request
+```json
+{
+    "email": "me@hyunsang.dev",
+    "password": "q1w2e3r4",
+    "nick_name": "HyunSang Park"
+}
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "error",
+        "status_code": 200,
+        "success": true,
+        "message": "성공적으로 요청하신 유저를 만들었어요!"
+    },
+    "data": {
+        "id": 1,
+        "user_uuid": "a1ba7027-cb01-41dd-9416-352aeea0ca99",
+        "user_email": "me@hyunsang.dev",
+        "user_password": "$2a$10$q/4bNIrzUrO.N7m8jYLyvudFuP21Ek4Kv2Fm/SkNDZY1Xt0URWZKi",
+        "user_nickname": "HyunSang Park",
+        "created_at": "2023-01-30T15:49:51.91299+09:00",
+        "updated_at": "2023-01-30T15:49:51.91299+09:00"
+    },
+    "responsed_at": "2023-01-30T15:49:51.9261+09:00"
+}
+```
+
+### POST `/auth/login`
+#### Request
+```json
+{
+    "email": "me@hyunsang.dev",
+    "password": "q1w2e3r4"
+}
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "success",
+        "status_code": 200,
+        "success": true,
+        "message": "성공적으로 로그인을 완료했어요!"
+    },
+    "data": {
+        "user_uuid": "a1ba7027-cb01-41dd-9416-352aeea0ca99",
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6IjYyZjM5OWUyLWM3ZTctNGZmMi1hNTY0LWUxMTQ5Y2NiOWYxNyIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2MjQ2OSwidXNlcl91dWlkIjoiYTFiYTcwMjctY2IwMS00MWRkLTk0MTYtMzUyYWVlYTBjYTk5In0.IxURueOzBaBbRJt7q-O26rXtH8g2_6dCXS9JiEz73kY",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU2NjYzNjksInJlZnJlc2hfdXVpZCI6Ijc1MjI2MmQ4LWU0ZjUtNDg5Zi05YjFmLTBiZDIyZmRhYjIyZSIsInVzZXJfdXVpZCI6ImExYmE3MDI3LWNiMDEtNDFkZC05NDE2LTM1MmFlZWEwY2E5OSJ9.gS_RH65_JUUYcPULj5tE-q36cG2guBzkQvcEHCpOEK8"
+    },
+    "responsed_at": "2023-01-30T15:52:49.567428+09:00"
+}
+```
+![](./assets/login-redis-01.png)
+
+![](./assets/login-redis-02.png)
+
 ## 참고한 자료들
 - [Redis를 통한 JWT Refresh Token 관리](https://sol-devlog.tistory.com/22)
 - [Spring + Security + JWT + Redis를 통한 회원인증/허가 구현 (3) - 로그인 시 Access, Refresh Token 부여/ 사용](https://velog.io/@ehdrms2034/Spring-Security-JWT-Redis%EB%A5%BC-%ED%86%B5%ED%95%9C-%ED%9A%8C%EC%9B%90%EC%9D%B8%EC%A6%9D%ED%97%88%EA%B0%80-%EA%B5%AC%ED%98%84)
