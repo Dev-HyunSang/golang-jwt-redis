@@ -29,10 +29,14 @@ func init() {
 	todoDescUpdatedAt := todoFields[4].Descriptor()
 	// todo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	todo.DefaultUpdatedAt = todoDescUpdatedAt.Default.(func() time.Time)
+	// todo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	todo.UpdateDefaultUpdatedAt = todoDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// todoDescCratedAt is the schema descriptor for crated_at field.
 	todoDescCratedAt := todoFields[5].Descriptor()
 	// todo.DefaultCratedAt holds the default value on creation for the crated_at field.
 	todo.DefaultCratedAt = todoDescCratedAt.Default.(func() time.Time)
+	// todo.UpdateDefaultCratedAt holds the default value on update for the crated_at field.
+	todo.UpdateDefaultCratedAt = todoDescCratedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUserUUID is the schema descriptor for user_uuid field.
@@ -54,9 +58,13 @@ func init() {
 	// userDescCreatedAt is the schema descriptor for created_at field.
 	userDescCreatedAt := userFields[4].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
-	user.DefaultCreatedAt = userDescCreatedAt.Default.(time.Time)
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultCreatedAt holds the default value on update for the created_at field.
+	user.UpdateDefaultCreatedAt = userDescCreatedAt.UpdateDefault.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
 	userDescUpdatedAt := userFields[5].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(time.Time)
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

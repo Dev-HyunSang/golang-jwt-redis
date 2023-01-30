@@ -57,6 +57,10 @@ var (
 	DefaultUserUUID func() uuid.UUID
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultCratedAt holds the default value on creation for the "crated_at" field.
 	DefaultCratedAt func() time.Time
+	// UpdateDefaultCratedAt holds the default value on update for the "crated_at" field.
+	UpdateDefaultCratedAt func() time.Time
 )

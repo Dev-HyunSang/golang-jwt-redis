@@ -75,25 +75,9 @@ func (tdu *ToDoUpdate) SetUpdatedAt(t time.Time) *ToDoUpdate {
 	return tdu
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (tdu *ToDoUpdate) SetNillableUpdatedAt(t *time.Time) *ToDoUpdate {
-	if t != nil {
-		tdu.SetUpdatedAt(*t)
-	}
-	return tdu
-}
-
 // SetCratedAt sets the "crated_at" field.
 func (tdu *ToDoUpdate) SetCratedAt(t time.Time) *ToDoUpdate {
 	tdu.mutation.SetCratedAt(t)
-	return tdu
-}
-
-// SetNillableCratedAt sets the "crated_at" field if the given value is not nil.
-func (tdu *ToDoUpdate) SetNillableCratedAt(t *time.Time) *ToDoUpdate {
-	if t != nil {
-		tdu.SetCratedAt(*t)
-	}
 	return tdu
 }
 
@@ -108,6 +92,7 @@ func (tdu *ToDoUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	tdu.defaults()
 	if len(tdu.hooks) == 0 {
 		affected, err = tdu.sqlSave(ctx)
 	} else {
@@ -153,6 +138,18 @@ func (tdu *ToDoUpdate) Exec(ctx context.Context) error {
 func (tdu *ToDoUpdate) ExecX(ctx context.Context) {
 	if err := tdu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (tdu *ToDoUpdate) defaults() {
+	if _, ok := tdu.mutation.UpdatedAt(); !ok {
+		v := todo.UpdateDefaultUpdatedAt()
+		tdu.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := tdu.mutation.CratedAt(); !ok {
+		v := todo.UpdateDefaultCratedAt()
+		tdu.mutation.SetCratedAt(v)
 	}
 }
 
@@ -257,25 +254,9 @@ func (tduo *ToDoUpdateOne) SetUpdatedAt(t time.Time) *ToDoUpdateOne {
 	return tduo
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (tduo *ToDoUpdateOne) SetNillableUpdatedAt(t *time.Time) *ToDoUpdateOne {
-	if t != nil {
-		tduo.SetUpdatedAt(*t)
-	}
-	return tduo
-}
-
 // SetCratedAt sets the "crated_at" field.
 func (tduo *ToDoUpdateOne) SetCratedAt(t time.Time) *ToDoUpdateOne {
 	tduo.mutation.SetCratedAt(t)
-	return tduo
-}
-
-// SetNillableCratedAt sets the "crated_at" field if the given value is not nil.
-func (tduo *ToDoUpdateOne) SetNillableCratedAt(t *time.Time) *ToDoUpdateOne {
-	if t != nil {
-		tduo.SetCratedAt(*t)
-	}
 	return tduo
 }
 
@@ -297,6 +278,7 @@ func (tduo *ToDoUpdateOne) Save(ctx context.Context) (*ToDo, error) {
 		err  error
 		node *ToDo
 	)
+	tduo.defaults()
 	if len(tduo.hooks) == 0 {
 		node, err = tduo.sqlSave(ctx)
 	} else {
@@ -348,6 +330,18 @@ func (tduo *ToDoUpdateOne) Exec(ctx context.Context) error {
 func (tduo *ToDoUpdateOne) ExecX(ctx context.Context) {
 	if err := tduo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (tduo *ToDoUpdateOne) defaults() {
+	if _, ok := tduo.mutation.UpdatedAt(); !ok {
+		v := todo.UpdateDefaultUpdatedAt()
+		tduo.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := tduo.mutation.CratedAt(); !ok {
+		v := todo.UpdateDefaultCratedAt()
+		tduo.mutation.SetCratedAt(v)
 	}
 }
 

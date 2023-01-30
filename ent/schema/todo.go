@@ -22,9 +22,11 @@ func (ToDo) Fields() []ent.Field {
 		field.String("todo_title"),
 		field.String("todo_context"),
 		field.Time("updated_at").
-			Default(time.Now),
+			Default(time.Now).
+			UpdateDefault(time.Now),
 		field.Time("crated_at").
-			Default(time.Now),
+			Default(time.Now).
+			UpdateDefault(time.Now),
 	}
 }
 
