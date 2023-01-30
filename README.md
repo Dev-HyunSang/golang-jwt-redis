@@ -84,6 +84,41 @@ Go언어와 JWT(JSON Web Token)의 취약점을 Redis로 보완하는 프로젝�
 
 ![](./assets/login-redis-02.png)
 
+### `/todo/create`
+
+#### Request
+```text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
+```
+```json
+{
+    "todo_title": "Hello, World!",
+    "todo_context": "Hello, World!"
+}
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "ok",
+        "status_code": 200,
+        "success": true,
+        "message": "성공적으로 새로운 할일을 생성했습니다."
+    },
+    "data": {
+        "id": 4,
+        "todo_uuid": "439c9657-1c25-41ee-a45e-90bbef0307d2",
+        "user_uuid": "99360f79-1bef-477f-8638-ee4127dfab17",
+        "todo_title": "Hello, World!",
+        "todo_context": "Hello, World!",
+        "updated_at": "2023-01-30T17:00:41.94033+09:00",
+        "crated_at": "2023-01-30T17:00:41.94033+09:00"
+    },
+    "responsed_at": "2023-01-30T17:00:41.951056+09:00"
+}
+```
+
 ## 참고한 자료들
 - [Redis를 통한 JWT Refresh Token 관리](https://sol-devlog.tistory.com/22)
 - [Spring + Security + JWT + Redis를 통한 회원인증/허가 구현 (3) - 로그인 시 Access, Refresh Token 부여/ 사용](https://velog.io/@ehdrms2034/Spring-Security-JWT-Redis%EB%A5%BC-%ED%86%B5%ED%95%9C-%ED%9A%8C%EC%9B%90%EC%9D%B8%EC%A6%9D%ED%97%88%EA%B0%80-%EA%B5%AC%ED%98%84)
