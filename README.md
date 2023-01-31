@@ -85,7 +85,8 @@ Go언어와 JWT(JSON Web Token)의 취약점을 Redis로 보완하는 프로젝�
 ![](./assets/login-redis-02.png)
 
 ### POST `/auth/logout`
-#### Request - Header
+#### Request
+**Header:**  
 ```text
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
 ```
@@ -105,11 +106,13 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRh
 ```
 
 ### POST `/todo/create`
-
-#### Request - Header & Body
+#### Request
+**Header:**  
 ```text
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
 ```
+
+**Body:**  
 ```json
 {
     "todo_title": "Hello, World!",
@@ -140,7 +143,7 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRh
 ```
 
 ### POST `/todo/update`
-#### Request - Header & Body
+#### Request
 **Header:**  
 ```text
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
