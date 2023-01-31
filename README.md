@@ -84,9 +84,29 @@ Go언어와 JWT(JSON Web Token)의 취약점을 Redis로 보완하는 프로젝�
 
 ![](./assets/login-redis-02.png)
 
-### `/todo/create`
+### POST `/auth/logout`
+#### Request - Header
+```text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
+```
 
-#### Request
+#### Response
+```json
+{
+    "meta": {
+        "status": "ok",
+        "status_code": 200,
+        "success": true,
+        "message": "성공적으로 로그아웃 되셨습니다."
+    },
+    "data": 1,
+    "responsed_at": "2023-01-31T18:47:45.112174+09:00"
+}
+```
+
+### POST `/todo/create`
+
+#### Request - Header & Body
 ```text
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
 ```
@@ -116,6 +136,36 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRh
         "crated_at": "2023-01-30T17:00:41.94033+09:00"
     },
     "responsed_at": "2023-01-30T17:00:41.951056+09:00"
+}
+```
+
+### POST `/todo/update`
+#### Request - Header & Body
+**Header:**  
+```text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
+```
+
+**Body:**
+```json
+{
+    "todo_uuid": "0004bbf4-233f-4b03-93ac-e9728224acb1",
+    "todo_title": "Hello, World!2",
+    "todo_context": "Hello, World!2"
+}
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "ok",
+        "status_code": 200,
+        "success": true,
+        "message": "성공적으로 할일을 수정했어요!"
+    },
+    "data": 1,
+    "responsed_at": "2023-01-31T18:52:23.817192+09:00"
 }
 ```
 
