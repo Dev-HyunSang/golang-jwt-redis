@@ -26,6 +26,20 @@ type TokenDetails struct {
 	RtExpires    int64     `json:"rt_expires"`
 }
 
+type AccessDetails struct {
+	AccessUUID string `json:"access_uuid"`
+	UserUUID   string `json:"user_uuid"`
+}
+
+type ToDo struct {
+	UserUUID    uuid.UUID `json:"user_uuid"`
+	ToDoUUID    uuid.UUID `json:"todo_uuid"`
+	ToDoTitle   string    `json:"todo_title"`
+	ToDoContext string    `json:"todo_context"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 // === Request ===
 type RequestJoinUser struct {
 	Email    string `json:"email"`
@@ -36,6 +50,11 @@ type RequestJoinUser struct {
 type RequestLoginUser struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type RequestCreateToDo struct {
+	ToDoTitle   string `json:"todo_title"`
+	ToDoContext string `json:"todo_context"`
 }
 
 // === Response ===
@@ -67,4 +86,10 @@ type ResponseOkLoginUser struct {
 	Meta        MetaData   `json:"meta"`
 	Data        TokenDatas `json:"data"`
 	ResponsedAt time.Time  `json:"responsed_at"`
+}
+
+type ResponseOkCreateToDo struct {
+	Meta        MetaData  `json:"meta"`
+	Data        *ent.ToDo `json:"data"`
+	ResponsedAt time.Time `json:"responsed_at"`
 }
