@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"github.com/dev-hyunsang/golang-jwt-redis/models"
 	"github.com/gofiber/fiber/v2"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Redis를 접속할 수 있는 기능입니다.
 func RedisInit() *redis.Client {
 	dsn := config.GetEnv("REDIS_ADDR")
 	if len(dsn) == 0 {
@@ -26,6 +28,7 @@ func RedisInit() *redis.Client {
 	return client
 }
 
+// 새로운 Access Token과 Refresh Token을 생성합니다.
 func CreateJWT(userUUID uuid.UUID) (*models.TokenDetails, error) {
 	td := new(models.TokenDetails)
 	var err error // 구조체를 사용하기 때문에 따로 지정함.
@@ -63,7 +66,7 @@ func CreateJWT(userUUID uuid.UUID) (*models.TokenDetails, error) {
 	return td, nil
 }
 
-func CreateAuth(userUUID uuid.UUID, td *models.TokenDetails) error {
+func InsertRedisAuth(userUUID uuid.UUID, td *models.TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
 
@@ -83,8 +86,14 @@ func FetchAuth(authD *models.AccessDetails) (string, error) {
 	client := RedisInit()
 
 	result, err := client.Get(context.Background(), authD.AccessUUID).Result()
+	if err != nil {
+		return "", err
+	}
+	if len(result) == 0 {
+		return "", errors.New("입력하신 정보를 통해서 인증 정보를 찾을 수 없어요. 다시 시도해 주세요.")
+	}
 
-	return result, err
+	return result, nil
 }
 
 func ExtractTokenMetaData(r *fiber.Ctx) (*models.AccessDetails, error) {
