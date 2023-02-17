@@ -27,7 +27,7 @@ func CreateToDo(todo *models.ToDo) (*ent.ToDo, error) {
 	return result, err
 }
 
-func UpdateToDo(updateToDo *models.ToDo) (int, error) {
+func UpdateToDo(updateToDo models.UpdateToDo) (int, error) {
 	client, err := ConnectionMySQL()
 	if err != nil {
 		return 0, err

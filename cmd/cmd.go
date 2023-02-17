@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/dev-hyunsang/golang-jwt-redis/auth"
 	"log"
 	"time"
@@ -113,7 +114,7 @@ func LoginUserHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	err = auth.CreateAuth(result.UserUUID, ts)
+	err = auth.InsertRedisAuth(result.UserUUID, ts)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.ResponseError{
 			Meta: models.MetaData{
@@ -355,6 +356,151 @@ func UpdateToDoHandler(c *fiber.Ctx) error {
 			Message:    "성공적으로 할일을 수정했어요!",
 		},
 		Data:        result,
+		ResponsedAt: time.Now(),
+	})
+}
+
+func ReadToDoHandler(c *fiber.Ctx) error {
+	tokenAuth, err := auth.ExtractTokenMetaData(c)
+	if err != nil {
+		log.Printf("[ERROR] ExtractTokenMetaData | %s", err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "unauthorized",
+				StatusCode: fiber.StatusUnauthorized,
+				Success:    false,
+				Message:    "잘못된 접근이예요. 로그인 이후에 시도해 주세요!",
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	userUUID, err := auth.FetchAuth(tokenAuth)
+	if err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusUnauthorized).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "unauthorized",
+				StatusCode: fiber.StatusUnauthorized,
+				Success:    false,
+				Message:    "잘못된 접근이예요. 로그인 이후에 시도해 주세요!",
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	parseUserUUID, err := uuid.Parse(userUUID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "error",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+				Message:    err.Error(),
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	result, err := database.ReadToDo(parseUserUUID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "error",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+				Message:    err.Error(),
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(models.ResponseOkReadToDo{
+		Meta: models.MetaData{
+			Status:     "ok",
+			StatusCode: fiber.StatusOK,
+			Success:    true,
+			Message:    "성공적으로 할일들을 불러왔습니다.",
+		},
+		Data:        result,
+		ResponsedAt: time.Now(),
+	})
+}
+
+func DeleteToDoHandler(c *fiber.Ctx) error {
+	req := new(models.RequestDeleteToDo)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "unprocessable entity",
+				StatusCode: fiber.StatusUnprocessableEntity,
+				Success:    false,
+				Message:    err.Error(),
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	tokenAuth, err := auth.ExtractTokenMetaData(c)
+	if err != nil {
+		log.Printf("[ERROR] ExtractTokenMetaData | %s", err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "unauthorized",
+				StatusCode: fiber.StatusUnauthorized,
+				Success:    false,
+				Message:    "잘못된 접근이예요. 로그인 이후에 시도해 주세요!",
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	userUUID, err := auth.FetchAuth(tokenAuth)
+	if err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusUnauthorized).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "unauthorized",
+				StatusCode: fiber.StatusUnauthorized,
+				Success:    false,
+				Message:    "잘못된 접근이예요. 로그인 이후에 시도해 주세요!",
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	parseUserUUID, err := uuid.Parse(userUUID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "error",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+				Message:    err.Error(),
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	if err := database.DeleteToDo(req.ToDoUUID, parseUserUUID); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.ResponseError{
+			Meta: models.MetaData{
+				Status:     "bad request",
+				StatusCode: fiber.StatusBadRequest,
+				Success:    false,
+				Message:    fmt.Sprintf("할 일을 조회할 수 없습니다. 확인 후 다시 시도해 주세요.\n%s", err.Error()),
+			},
+			ResponsedAt: time.Now(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(models.ResponseOk{
+		Meta: models.MetaData{
+			Status:     "ok",
+			StatusCode: fiber.StatusOK,
+			Success:    true,
+			Message:    "정상적으로 할일을 삭제했습니다.",
+		},
 		ResponsedAt: time.Now(),
 	})
 }
