@@ -185,7 +185,7 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImU0YzNjZDA2LWU4
     "meta": {
         "status": "ok",
         "status_code": 200,
-        "success": false,
+        "success": true,
         "message": "성공적으로 할일들을 불러왔습니다."
     },
     "data": [
@@ -200,6 +200,30 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImU0YzNjZDA2LWU4
         }
     ],
     "responsed_at": "2023-02-17T18:10:37.835866+09:00"
+}
+```
+
+### POST `/todo/delete`
+#### Request
+```text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImU0YzNjZDA2LWU4ZjUtNDczMS1iYmJlLWZjN2U4Mjc3ZjdhZSIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NjYyNTE2OCwidXNlcl91dWlkIjoiNDEzYzJlZDgtNDk1Ni00NjA1LWExMzItMGZhOWE1Y2FjYzM5In0.GwLb9vozU6rVCjvVSjzaqUpxVDnHfASisrA094yKrHg
+```
+```json
+{
+   "todo_uuid": "94567457-7866-4be9-8584-78a4d96fa3f1"
+}
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "ok",
+        "status_code": 200,
+        "success": true,
+        "message": "정상적으로 할일을 삭제했습니다."
+    },
+    "responsed_at": "2023-02-17T19:11:15.506825+09:00"
 }
 ```
 
