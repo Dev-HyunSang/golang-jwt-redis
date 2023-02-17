@@ -39,6 +39,12 @@ type ToDo struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+type UpdateToDo struct {
+	UserUUID    uuid.UUID `json:"user_uuid"`
+	ToDoUUID    uuid.UUID `json:"todo_uuid"`
+	ToDoTitle   string    `json:"todo_title"`
+	ToDoContext string    `json:"todo_context"`
+}
 
 // === Request ===
 type RequestJoinUser struct {
@@ -55,6 +61,16 @@ type RequestLoginUser struct {
 type RequestCreateToDo struct {
 	ToDoTitle   string `json:"todo_title"`
 	ToDoContext string `json:"todo_context"`
+}
+
+type RequestUpdateToDo struct {
+	ToDoUUID    uuid.UUID `json:"todo_uuid"`
+	ToDoTitle   string    `json:"todo_title"`
+	ToDoContext string    `json:"todo_context"`
+}
+
+type RequestDeleteToDo struct {
+	ToDoUUID uuid.UUID `json:"todo_uuid"`
 }
 
 // === Response ===
@@ -81,6 +97,10 @@ type TokenDatas struct {
 	AccessToken  string    `json:"access_token"`
 	RefreshToken string    `json:"refresh_token"`
 }
+type ResponseOk struct {
+	Meta        MetaData  `json:"meta"`
+	ResponsedAt time.Time `json:"responsed_at"`
+}
 
 type ResponseOkLoginUser struct {
 	Meta        MetaData   `json:"meta"`
@@ -91,5 +111,23 @@ type ResponseOkLoginUser struct {
 type ResponseOkCreateToDo struct {
 	Meta        MetaData  `json:"meta"`
 	Data        *ent.ToDo `json:"data"`
+	ResponsedAt time.Time `json:"responsed_at"`
+}
+
+type ResponseOkUpdateToDo struct {
+	Meta        MetaData  `json:"meta"`
+	Data        int       `json:"data"`
+	ResponsedAt time.Time `json:"responsed_at"`
+}
+
+type ResponseOkReadToDo struct {
+	Meta        MetaData    `json:"meta"`
+	Data        []*ent.ToDo `json:"data"`
+	ResponsedAt time.Time   `json:"responsed_at"`
+}
+
+type ResponseOkLogout struct {
+	Meta        MetaData  `json:"meta"`
+	Data        int64     `json:"data"`
 	ResponsedAt time.Time `json:"responsed_at"`
 }
