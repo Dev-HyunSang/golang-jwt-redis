@@ -90,6 +90,7 @@ Go언어와 JWT(JSON Web Token)의 취약점을 Redis로 보완하는 프로젝�
 ```text
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRhZWMtNGVmYi1hNWNmLTZiZWVmZjVjYzk5OCIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NTA2NjMzNiwidXNlcl91dWlkIjoiOTkzNjBmNzktMWJlZi00NzdmLTg2MzgtZWU0MTI3ZGZhYjE3In0.G5iW0m2SL4mMHZR13TAy-7It4gDAeVidcYoC5fc1vwc
 ```
+- `access_token`으로 발급된 토큰을 이용해서 로그인 할 수 있습니다.
 
 #### Response
 ```json
@@ -169,6 +170,36 @@ Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImNkNGJhMTcyLTRh
     },
     "data": 1,
     "responsed_at": "2023-01-31T18:52:23.817192+09:00"
+}
+```
+
+### POST `/todo/read`
+#### Request
+```text
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImU0YzNjZDA2LWU4ZjUtNDczMS1iYmJlLWZjN2U4Mjc3ZjdhZSIsImF1dGhvcml6ZWQiOnRydWUsImV4cCI6MTY3NjYyNTE2OCwidXNlcl91dWlkIjoiNDEzYzJlZDgtNDk1Ni00NjA1LWExMzItMGZhOWE1Y2FjYzM5In0.GwLb9vozU6rVCjvVSjzaqUpxVDnHfASisrA094yKrHg
+```
+
+#### Response
+```json
+{
+    "meta": {
+        "status": "ok",
+        "status_code": 200,
+        "success": false,
+        "message": "성공적으로 할일들을 불러왔습니다."
+    },
+    "data": [
+        {
+            "id": 1,
+            "todo_uuid": "94567457-7866-4be9-8584-78a4d96fa3f1",
+            "user_uuid": "413c2ed8-4956-4605-a132-0fa9a5cacc39",
+            "todo_title": "Hello, World!",
+            "todo_context": "Hello, World!",
+            "updated_at": "2023-02-17T09:00:43Z",
+            "crated_at": "2023-02-17T09:00:43Z"
+        }
+    ],
+    "responsed_at": "2023-02-17T18:10:37.835866+09:00"
 }
 ```
 
